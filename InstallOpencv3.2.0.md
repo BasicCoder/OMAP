@@ -75,3 +75,12 @@ sudo ldconfig
 `apt-file update ` </br>
 `apt-file find gstreamer-base-1.0`</br>
 `sudo apt-get install 'find-result'`</br>
+
+# Anaconda install opencv
+`https://anaconda.org/menpo/opencv3`
+
+## Install
+If you have the Anaconda python distribution installed in your system, you can issue this command (assuming you are working on linux) fire up the terminal:  
+`conda install -c menpo opencv`  
+If the version of python install in your Anaconda is 2.7, the command above should install OpenCV 3.1, but if the version of your python is 3.5, then you should change 'opencv' in the last line to 'opencv3'   
+`conda install -c menpo opencv3`   
