@@ -35,6 +35,14 @@ cmake 报告当中会出现提示错误，缺少库等，需要慢慢进行解�
 `export PYTHONPATH=caffe_root/python:$PYTHONPATH` </br>
 `source ~/.bashrc`
 
+或者是 github 上 clone 下来的项目
+编写文件 bashcaffe:
+` export PYTHONPATH=`pwd`/caffe_root/python:$PYTHONPATH `
+` export PYTHONPATH=`pwd`/lib:$PYTHONPATH` `
+
+执行:
+source bashcaffe
+
 ## 重新编译项目
 ### (1).
 从 github 上 clone 下来的 Caffe 项目，因为可能添加了一些新层，所以需要对项目进行重新编译，CUDA8.0 和cudnn5.1 在 python2.7 环境下支持 Caffe 这种操作
