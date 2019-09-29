@@ -72,3 +72,62 @@ source bashcaffe
 
 ` export LD_LIBRARY_PATH=/home/XXX/cudnn/cudnn_v6/lib64:$LD_LIBRARY_PATH `
 ` source ~/.bashrc` 
+
+## Error
+### 使用Anaconda 环境
+ubuntu16.04安装caffe时，使用Anaconda带的库进行make.将 Makefile.config 里面的设置修改为：（注意anaconda后面的数字与本机的相符）
+* CUDA=8.0
+* CUDNN=5.1
+
+`sh
+ANACONDA_HOME := $(HOME)/anaconda3/envs/python2.7 
+PYTHON_INCLUDE := $(ANACONDA_HOME)/include \
+         $(ANACONDA_HOME)/include/python2.7 \
+         $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include \
+PYTHON_LIB := $(ANACONDA_HOME)/lib
+`
+
+然后make过程中遇到以下错误：
+
+`sh
+CXX/LD -o .build_release/tools/upgrade_net_proto_text.bin
+/usr/bin/ld: warning: libjpeg.so.9, needed by /home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so, not found (try using -rpath or -rpath-link)
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_finish_decompress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_set_quality@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_quality_scaling@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_destroy_decompress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_resync_to_restart@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_CreateDecompress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_alloc_huff_table@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_set_defaults@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_CreateCompress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_stdio_src@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_finish_compress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_calc_output_dimensions@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_std_error@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_default_qtables@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_start_decompress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_write_scanlines@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_simple_progression@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_read_header@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_read_scanlines@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_start_compress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_destroy_compress@LIBJPEG_9.0'
+/home/bc/anaconda3/envs/python2.7/lib/libopencv_imgcodecs.so: undefined reference to `jpeg_stdio_dest@LIBJPEG_9.0'
+collect2: error: ld returned 1 exit status
+Makefile:619: recipe for target '.build_release/tools/caffe.bin' failed
+make: *** [.build_release/tools/caffe.bin] Error 1
+make: *** Waiting for unfinished jobs....
+`
+
+发现是找不到libpng16.so.16与libjpeg.so.9文件．打开anaconda中的…anaconda2/lib路径，发现anaconda下有libpng16.so.16与libjpeg.so.9，于是进行如下操作：
+1. warning: libjpeg.so.9, needed by /home/.../anaconda2/lib/libopencv_imgcodecs.so, not found
+
+`sh
+cd /usr/lib/x86_64-linux-gnu
+sudo ln -s ~/anaconda2/lib/libpng16.so.16 /usr/lib/
+sudo ln -s ~/anaconda2/lib/libjpeg.so.9 /usr/lib/
+sudo ldconfig
+`
+为这两个文件在/usr/lib/下建立一个同步的链接． 
+再次make，问题消失．
